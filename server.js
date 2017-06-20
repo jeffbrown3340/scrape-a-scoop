@@ -26,6 +26,21 @@ db.on("error", function(error) {
 db.once("open", function() {
   console.log("Mongoose connection successful.");
 });
+
+app.get("/", function(req, res) {
+  request("http://www.kentucky.com/latest-news/", function(error, response, html) {
+    var result = {};
+    var $ = cheerio.load(html);
+    $("article h4").each(function(i, element) {
+      // console.log("i=:", i, ":-- element=", element);
+      result.title = $(this).children("a").text();
+      result.link = $(this).children("a").attr("href");
+    });
+    res.render("articles", {articles: result});
+  });
+});
+
+
 app.get("/scrape", function(req, res) {
   request("http://www.kentucky.com/latest-news/", function(error, response, html) {
     var $ = cheerio.load(html);
